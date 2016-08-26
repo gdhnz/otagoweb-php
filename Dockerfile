@@ -8,9 +8,13 @@ RUN VERSION=`cat /etc/redhat-release | awk '{printf "%d", $4}'` \
     && rpm -U --quiet /tmp/epel-release-latest-$VERSION.noarch.rpm /tmp/remi-release-$VERSION.rpm \
     && rm -f /tmp/epel-release-latest-$VERSION.noarch.rpm /tmp/remi-release-$VERSION.rpm \
     && /usr/bin/yum-config-manager --enable remi-php70 \
-    && yum -q -y install supervisor \
+    && yum -q -y install supervisor yum-cron \
     && yum clean all \
-    && mkdir -p /var/log/supervisor
+    && mkdir -p /var/log/supervisor \
+    && mkdir -p /var/lock/subsys \
+    && touch /var/lock/subsys/yum-cron \
+    && sed -i "s/apply_updates = no/apply_updates = yes/g" /etc/yum/yum-cron.conf \
+    && sed -i "s/apply_updates = no/apply_updates = yes/g" /etc/yum/yum-cron-hourly.conf
 
 # Update and install apache and php
 RUN yum -q -y update \
@@ -55,6 +59,7 @@ COPY files/apache.conf /etc/httpd/conf.d/
 
 # Add supervisord config to image
 COPY files/supervisord.ini /etc/supervisord.d/default.ini
+RUN chmod 600 /etc/supervisord.d/*.ini
 
 WORKDIR /var/www/html
 EXPOSE 80
