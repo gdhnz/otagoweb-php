@@ -2,7 +2,8 @@ FROM alpine:latest
 
 RUN echo "@testing http://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories \
     && apk update \
-    && apk add apache2 ca-certificates \
+    && apk upgrade \
+    && apk -U add apache2 ca-certificates musl \
         php5-apache2 \
         php5-bcmath \
         php5-bz2 \
@@ -41,16 +42,12 @@ RUN echo "@testing http://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/ap
         php5-sysvsem \
         php5-sysvshm \
         php5-wddx \
-        php5-xdebug@testing \
         php5-xml \
         php5-xmlreader \
         php5-xmlrpc \
         php5-xsl \
         php5-zip \
-        php5-zlib
-
-
-RUN apk add -u musl \
+        php5-zlib \
     && rm -rf /var/cache/apk/*
 
 ADD files/geolitecity /etc/periodic/monthly/
@@ -71,6 +68,7 @@ RUN mkdir -p /scripts/pre-exec.d && \
     mkdir -p /scripts/pre-init.d && \
     chmod -R 755 /scripts
 
+ENV PHP_INI_SCAN_DIR /app/php:/etc/php5/conf.d
 EXPOSE 80
 WORKDIR /app
 
