@@ -14,7 +14,9 @@ RUN VERSION=`cat /etc/redhat-release | awk '{printf "%d", $4}'` \
     && mkdir -p /var/lock/subsys \
     && touch /var/lock/subsys/yum-cron \
     && sed -i "s/apply_updates = no/apply_updates = yes/g" /etc/yum/yum-cron.conf \
-    && sed -i "s/apply_updates = no/apply_updates = yes/g" /etc/yum/yum-cron-hourly.conf
+    && sed -i "s/apply_updates = no/apply_updates = yes/g" /etc/yum/yum-cron-hourly.conf \
+    && sed -i "s/download_updates = no/download_updates = yes/g" /etc/yum/yum-cron-hourly.conf \
+    && sed -i "s/update_messages = no/update_messages = yes/g" /etc/yum/yum-cron-hourly.conf
 
 # Update and install apache and php
 RUN yum -q -y update \
