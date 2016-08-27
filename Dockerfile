@@ -44,6 +44,8 @@ RUN yum -q -y update \
         php-xml \
         php-xmlrpc \
         GeoIP-update \
+        composer \
+    && echo -e "\n\nalias comp='php -n /usr/bin/composer'" >> ~/.bashrc \
     && yum clean all
 
 # Update Servername to localhost
@@ -64,5 +66,5 @@ COPY files/supervisord.ini /etc/supervisord.d/default.ini
 RUN chmod 600 /etc/supervisord.d/*.ini
 
 WORKDIR /var/www/html
-EXPOSE 80
+EXPOSE 80 443
 CMD ["/bin/supervisord", "-c", "/etc/supervisord.conf"]
