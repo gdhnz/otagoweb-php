@@ -2,7 +2,7 @@ FROM centos:latest
 
 # Install REMI php yum repos
 RUN VERSION=`cat /etc/redhat-release | awk '{printf "%d", $4}'` \
-    && yum -q -y install deltarpm wget \
+    && yum -q -y install deltarpm wget pygpgme \
     && wget -q -P /tmp https://dl.fedoraproject.org/pub/epel/epel-release-latest-$VERSION.noarch.rpm \
     && wget -q -P /tmp http://rpms.remirepo.net/enterprise/remi-release-$VERSION.rpm \
     && rpm -U --quiet /tmp/epel-release-latest-$VERSION.noarch.rpm /tmp/remi-release-$VERSION.rpm \
@@ -45,8 +45,17 @@ RUN yum -q -y update \
         php-xmlrpc \
         GeoIP-update \
         composer \
-    && echo -e "\n\nalias comp='php -n /usr/bin/composer'" >> ~/.bashrc \
+    && echo -e '\n\nfunction composer() { COMPOSER="/usr/bin/composer" || { echo "Could not find composer in path" >&2 ; return 1 ; } && sed -i "s/zend/;zend/g" /etc/php.d/15-xdebug.ini ; $COMPOSER "$@" ; STATUS=$? ; sed -i "s/;zend/zend/g" /etc/php.d/15-xdebug.ini ; return $STATUS ; }' >> ~/.bashrc \
+    && mkdir -p /var/www/php \
+    && sed -i "s/include-path/include-path\ninclude_path = '.:\/var\/www\/php:\/usr\/share\/php'/g" /etc/php.ini \
     && yum clean all
+
+# Install blackfire php probe
+RUN version=$(php -r "echo PHP_MAJOR_VERSION.PHP_MINOR_VERSION;") \
+    && curl -A "Docker" -o /tmp/blackfire-probe.tar.gz -D - -L -s https://blackfire.io/api/v1/releases/probe/php/linux/amd64/$version \
+    && tar zxpf /tmp/blackfire-probe.tar.gz -C /tmp \
+    && mv /tmp/blackfire-*.so $(php -r "echo ini_get('extension_dir');")/blackfire.so \
+    && printf "extension=blackfire.so\nblackfire.agent_socket=tcp://blackfire:8707\n" > /etc/php.d/blackfire.ini
 
 # Update Servername to localhost
 RUN sed -i "s/#ServerName.*/ServerName localhost/g" /etc/httpd/conf/httpd.conf \
