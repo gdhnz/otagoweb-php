@@ -1,23 +1,19 @@
-This is a CentOS 7 image that includes apache, php, composer, and the blackfire php probe. In order to use this image effectively, you'll need to mount:
+This is an Alpine Linux image that includes apache and php. In order to use this image effectively, you'll need to mount:
 
-* /var/www/html/public for your site content (e.g. using "-v /home/user/site:/var/www/html/public")
+* /app/htdocs/public for your site content (e.g. using "-v /home/user/site:/app/htdocs/public")
 
 ### Optional mounts
-* /etc/php.d for additional .ini files for php
-* /var/www/php is also available as a php includes directory
+* /app/php for additional .ini files for php
+* /usr/share/php is also available as a php includes directory
 
 ## Example
 ```bash
-$ docker run -p 8080:80 -v /home/user/mysite:/var/www/html/public -d otagoweb/centos
+$ docker run -p 8080:80 -v /home/user/mysite:/app/htdocs/public -d otagoweb/php
 ```
-
-## Blackfire
-To connect to the blackfire agent, you'll need to run the [blackfire/blackfire](https://hub.docker.com/r/blackfire/blackfire/) image. For more information, visit https://blackfire.io/docs/integrations/docker.
 
 ## Installed php packages
 ### PHP Modules
 * bcmath
-* blackfire
 * bz2
 * calendar
 * Core
@@ -25,6 +21,7 @@ To connect to the blackfire agent, you'll need to run the [blackfire/blackfire](
 * curl
 * date
 * dom
+* ereg
 * exif
 * fileinfo
 * filter
@@ -32,13 +29,12 @@ To connect to the blackfire agent, you'll need to run the [blackfire/blackfire](
 * gd
 * geoip
 * gettext
+* gmp
 * hash
 * iconv
-* igbinary
 * intl
 * json
 * ldap
-* libsodium
 * libxml
 * mbstring
 * mcrypt
@@ -52,27 +48,21 @@ To connect to the blackfire agent, you'll need to run the [blackfire/blackfire](
 * pdo_sqlite
 * Phar
 * posix
-* pspell
 * readline
-* recode
 * redis
 * Reflection
 * session
 * shmop
 * SimpleXML
-* snmp
 * soap
 * sockets
 * SPL
-* sqlite3
 * standard
 * sysvmsg
 * sysvsem
 * sysvshm
-* tidy
 * tokenizer
 * wddx
-* xdebug
 * xml
 * xmlreader
 * xmlrpc
@@ -83,6 +73,4 @@ To connect to the blackfire agent, you'll need to run the [blackfire/blackfire](
 * zlib
 
 ### Zend Modules
-* Xdebug
 * Zend OPcache
-* blackfire
