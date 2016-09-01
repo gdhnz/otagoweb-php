@@ -69,7 +69,7 @@ RUN mkdir -p /scripts/pre-exec.d && \
     chmod -R 755 /scripts
 
 ENV PHP_INI_SCAN_DIR /app/php:/etc/php5/conf.d
-EXPOSE 80
+EXPOSE 80 443
 WORKDIR /app
 
 CMD ["/scripts/run.sh"]
