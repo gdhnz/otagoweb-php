@@ -1,6 +1,6 @@
 FROM centos:latest
 
-# Install REMI php yum repos
+# Install REMI php yum repos and update
 RUN VERSION=`cat /etc/redhat-release | awk '{printf "%d", $4}'` \
     && yum -q -y install deltarpm wget pygpgme \
     && wget -q -P /tmp https://dl.fedoraproject.org/pub/epel/epel-release-latest-$VERSION.noarch.rpm \
@@ -9,18 +9,18 @@ RUN VERSION=`cat /etc/redhat-release | awk '{printf "%d", $4}'` \
     && rm -f /tmp/epel-release-latest-$VERSION.noarch.rpm /tmp/remi-release-$VERSION.rpm \
     && /usr/bin/yum-config-manager --enable remi-php70 \
     && yum -q -y install supervisor yum-cron \
-    && yum clean all \
+    && /usr/bin/localedef -c -i en_US -f UTF-8 en_US.UTF-8 \
     && mkdir -p /var/log/supervisor \
     && mkdir -p /var/lock/subsys \
     && touch /var/lock/subsys/yum-cron \
     && sed -i "s/apply_updates = no/apply_updates = yes/g" /etc/yum/yum-cron.conf \
     && sed -i "s/apply_updates = no/apply_updates = yes/g" /etc/yum/yum-cron-hourly.conf \
     && sed -i "s/download_updates = no/download_updates = yes/g" /etc/yum/yum-cron-hourly.conf \
-    && sed -i "s/update_messages = no/update_messages = yes/g" /etc/yum/yum-cron-hourly.conf
+    && sed -i "s/update_messages = no/update_messages = yes/g" /etc/yum/yum-cron-hourly.conf \
+    && yum -q -y update
 
-# Update and install apache and php
-RUN yum -q -y update \
-    && yum -q -y install httpd \
+# Install apache and php
+RUN yum -q -y install httpd \
         php \
         php-bcmath \
         php-gd \
