@@ -7,7 +7,7 @@ RUN VERSION=`cat /etc/redhat-release | awk '{printf "%d", $4}'` \
     && wget -q -P /tmp http://rpms.remirepo.net/enterprise/remi-release-$VERSION.rpm \
     && rpm -U --quiet /tmp/epel-release-latest-$VERSION.noarch.rpm /tmp/remi-release-$VERSION.rpm \
     && rm -f /tmp/epel-release-latest-$VERSION.noarch.rpm /tmp/remi-release-$VERSION.rpm \
-    && /usr/bin/yum-config-manager --enable remi-php70 \
+    && /usr/bin/yum-config-manager --enable remi-php71 \
     && yum -q -y install supervisor yum-cron \
     && /usr/bin/localedef -c -i en_US -f UTF-8 en_US.UTF-8 \
     && mkdir -p /var/log/supervisor \
