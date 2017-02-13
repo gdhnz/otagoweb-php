@@ -48,14 +48,14 @@ RUN yum -q -y install httpd \
     && echo -e '\n\nfunction composer() { COMPOSER="/usr/bin/composer" || { echo "Could not find composer in path" >&2 ; return 1 ; } && sed -i "s/zend/;zend/g" /etc/php.d/15-xdebug.ini ; $COMPOSER "$@" ; STATUS=$? ; sed -i "s/;zend/zend/g" /etc/php.d/15-xdebug.ini ; return $STATUS ; }' >> ~/.bashrc \
     && mkdir -p /var/www/php \
     && sed -i "s/include-path/include-path\ninclude_path = '.:\/var\/www\/php:\/usr\/share\/php'/g" /etc/php.ini \
+    && sed -i "s/zend_extension/;zend_extension/g" /etc/php.d/15-xdebug.ini \
     && yum clean all
 
 # Install blackfire php probe
-RUN version=$(php -r "echo PHP_MAJOR_VERSION.PHP_MINOR_VERSION;") \
-    && curl -A "Docker" -o /tmp/blackfire-probe.tar.gz -D - -L -s https://blackfire.io/api/v1/releases/probe/php/linux/amd64/$version \
-    && tar zxpf /tmp/blackfire-probe.tar.gz -C /tmp \
-    && mv /tmp/blackfire-*.so $(php -r "echo ini_get('extension_dir');")/blackfire.so \
-    && printf "extension=blackfire.so\nblackfire.agent_socket=tcp://blackfire:8707\n" > /etc/php.d/blackfire.ini
+RUN wget -O - "http://packages.blackfire.io/fedora/blackfire.repo" | tee /etc/yum.repos.d/blackfire.repo \
+    && sed -i "s/repo_gpgcheck=1/repo_gpgcheck=0/g" /etc/yum.repos.d/blackfire.repo \
+    && yum -y install blackfire-php \
+    && sed -i "s/blackfire\.agent_socket\s=.*/blackfire\.agent_socket=tcp:\/\/blackfire:8707/g" /etc/php.d/zz-blackfire.ini
 
 # Update Servername to localhost
 RUN sed -i "s/#ServerName.*/ServerName localhost/g" /etc/httpd/conf/httpd.conf \
