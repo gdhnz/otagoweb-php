@@ -2,7 +2,7 @@ FROM centos:latest
 
 # Install REMI php yum repos and update
 RUN VERSION=`cat /etc/redhat-release | awk '{printf "%d", $4}'` \
-    && yum -q -y install deltarpm wget pygpgme \
+    && yum makecache fast && yum -q -y install deltarpm wget pygpgme \
     && wget -q -P /tmp https://dl.fedoraproject.org/pub/epel/epel-release-latest-$VERSION.noarch.rpm \
     && wget -q -P /tmp http://rpms.remirepo.net/enterprise/remi-release-$VERSION.rpm \
     && rpm -U --quiet /tmp/epel-release-latest-$VERSION.noarch.rpm /tmp/remi-release-$VERSION.rpm \
