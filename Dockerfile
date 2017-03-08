@@ -53,7 +53,7 @@ RUN yum -q -y install httpd \
     && sed -i "s/include-path/include-path\ninclude_path = '.:\/var\/www\/php:\/usr\/share\/php'/g" /etc/php.ini \
     && sed -i "s/zend_extension/;zend_extension/g" /etc/php.d/15-xdebug.ini \
     && ln -s /proc/1/fd/1 /var/log/httpd/access_log \
-    && ln -s /proc/1/fd/2 /var/log/httpd/error_log \
+    && ln -s /proc/1/fd/2 /var/log/httpd/error_log
 
 # Install blackfire php probe
 RUN wget -O - "http://packages.blackfire.io/fedora/blackfire.repo" | tee /etc/yum.repos.d/blackfire.repo \
