@@ -17,7 +17,8 @@ RUN VERSION=`cat /etc/redhat-release | awk '{printf "%d", $4}'` \
     && sed -i "s/apply_updates = no/apply_updates = yes/g" /etc/yum/yum-cron-hourly.conf \
     && sed -i "s/download_updates = no/download_updates = yes/g" /etc/yum/yum-cron-hourly.conf \
     && sed -i "s/update_messages = no/update_messages = yes/g" /etc/yum/yum-cron-hourly.conf \
-    && yum -q -y update
+    && yum -q -y update \
+    && yum clean all
 
 # Install apache and php
 RUN yum -q -y install httpd \
@@ -46,13 +47,13 @@ RUN yum -q -y install httpd \
         GeoIP-update \
         composer \
         git \
+    && yum clean all \
     && echo -e '\n\nfunction composer() { COMPOSER="/usr/bin/composer" || { echo "Could not find composer in path" >&2 ; return 1 ; } && sed -i "s/zend/;zend/g" /etc/php.d/15-xdebug.ini ; $COMPOSER "$@" ; STATUS=$? ; sed -i "s/;zend/zend/g" /etc/php.d/15-xdebug.ini ; return $STATUS ; }' >> ~/.bashrc \
     && mkdir -p /var/www/php \
     && sed -i "s/include-path/include-path\ninclude_path = '.:\/var\/www\/php:\/usr\/share\/php'/g" /etc/php.ini \
     && sed -i "s/zend_extension/;zend_extension/g" /etc/php.d/15-xdebug.ini \
     && ln -s /proc/1/fd/1 /var/log/httpd/access_log \
     && ln -s /proc/1/fd/2 /var/log/httpd/error_log \
-    && yum clean all
 
 # Install blackfire php probe
 RUN wget -O - "http://packages.blackfire.io/fedora/blackfire.repo" | tee /etc/yum.repos.d/blackfire.repo \
