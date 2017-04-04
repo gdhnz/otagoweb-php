@@ -59,6 +59,7 @@ RUN yum -q -y install httpd \
 RUN wget -O - "http://packages.blackfire.io/fedora/blackfire.repo" | tee /etc/yum.repos.d/blackfire.repo \
     && sed -i "s/repo_gpgcheck=1/repo_gpgcheck=0/g" /etc/yum.repos.d/blackfire.repo \
     && yum -q -y install blackfire-php \
+    && yum clean all \
     && sed -i "s/blackfire\.agent_socket\s=.*/blackfire\.agent_socket=tcp:\/\/blackfire:8707/g" /etc/php.d/zz-blackfire.ini
 
 # Update Servername to localhost
