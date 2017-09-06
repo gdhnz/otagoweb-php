@@ -53,7 +53,8 @@ RUN yum -q -y install httpd \
     && sed -i "s/include-path/include-path\ninclude_path = '.:\/var\/www\/php:\/usr\/share\/php'/g" /etc/php.ini \
     && sed -i "s/zend_extension/;zend_extension/g" /etc/php.d/15-xdebug.ini \
     && ln -s /proc/1/fd/1 /var/log/httpd/access_log \
-    && ln -s /proc/1/fd/2 /var/log/httpd/error_log
+    && ln -s /proc/1/fd/2 /var/log/httpd/error_log \
+    && ln -s /usr/share/GeoIP/GeoLiteCity.dat /usr/share/GeoIP/GeoIPCity.dat
 
 # Install blackfire php probe
 RUN wget -O - "http://packages.blackfire.io/fedora/blackfire.repo" | tee /etc/yum.repos.d/blackfire.repo \
@@ -66,11 +67,6 @@ RUN wget -O - "http://packages.blackfire.io/fedora/blackfire.repo" | tee /etc/yu
 RUN sed -i "s/#ServerName.*/ServerName localhost/g" /etc/httpd/conf/httpd.conf \
     && sed -i "s/DocumentRoot/#DocumentRoot/g" /etc/httpd/conf/httpd.conf \
     && mkdir -p /var/www/html/public
-
-# Add GeoLite City database to image
-COPY files/geolitecityupdate.sh /etc/cron.weekly/geolitecityupdate
-RUN chmod +x /etc/cron.weekly/geolitecityupdate \
-    && /etc/cron.weekly/geolitecityupdate
 
 # Add apache config to image
 COPY files/apache.conf /etc/httpd/conf.d/
