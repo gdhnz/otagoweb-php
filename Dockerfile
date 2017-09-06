@@ -54,6 +54,7 @@ RUN yum -q -y install httpd \
     && sed -i "s/zend_extension/;zend_extension/g" /etc/php.d/15-xdebug.ini \
     && ln -s /proc/1/fd/1 /var/log/httpd/access_log \
     && ln -s /proc/1/fd/2 /var/log/httpd/error_log \
+    && /etc/cron.weekly/geoipupdate \
     && ln -s /usr/share/GeoIP/GeoLiteCity.dat /usr/share/GeoIP/GeoIPCity.dat
 
 # Install blackfire php probe
