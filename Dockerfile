@@ -18,7 +18,8 @@ RUN VERSION=`cat /etc/redhat-release | awk '{printf "%d", $4}'` \
     && sed -i "s/download_updates = no/download_updates = yes/g" /etc/yum/yum-cron-hourly.conf \
     && sed -i "s/update_messages = no/update_messages = yes/g" /etc/yum/yum-cron-hourly.conf \
     && yum -q -y update \
-    && yum clean all
+    && yum clean all \
+    && rm -rf /var/cache/yum
 
 # Install apache and php
 RUN yum -q -y install httpd \
@@ -26,6 +27,7 @@ RUN yum -q -y install httpd \
         php-bcmath \
         php-gd \
         php-intl \
+        php-json \
         php-ldap \
         php-mbstring \
         php-mcrypt \
@@ -48,6 +50,7 @@ RUN yum -q -y install httpd \
         composer \
         git \
     && yum clean all \
+    && rm -rf /var/cache/yum \
     && echo -e '\n\nfunction composer() { COMPOSER="/usr/bin/composer" || { echo "Could not find composer in path" >&2 ; return 1 ; } && sed -i "s/zend/;zend/g" /etc/php.d/15-xdebug.ini ; $COMPOSER "$@" ; STATUS=$? ; sed -i "s/;zend/zend/g" /etc/php.d/15-xdebug.ini ; return $STATUS ; }' >> ~/.bashrc \
     && mkdir -p /var/www/php \
     && sed -i "s/include-path/include-path\ninclude_path = '.:\/var\/www\/php:\/usr\/share\/php'/g" /etc/php.ini \
@@ -62,6 +65,7 @@ RUN wget -O - "http://packages.blackfire.io/fedora/blackfire.repo" | tee /etc/yu
     && sed -i "s/repo_gpgcheck=1/repo_gpgcheck=0/g" /etc/yum.repos.d/blackfire.repo \
     && yum -q -y install blackfire-php \
     && yum clean all \
+    && rm -rf /var/cache/yum \
     && sed -i "s/blackfire\.agent_socket\s=.*/blackfire\.agent_socket=tcp:\/\/blackfire:8707/g" /etc/php.d/zz-blackfire.ini
 
 # Update Servername to localhost
