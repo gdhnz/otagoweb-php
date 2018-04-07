@@ -8,7 +8,7 @@ RUN VERSION=`cat /etc/redhat-release | awk '{printf "%d", $4}'` \
     && wget -q -P /tmp https://www6.atomicorp.com/channels/atomic/centos/$VERSION/x86_64/RPMS/atomic-release-1.0-21.el7.art.noarch.rpm \
     && rpm -U --quiet /tmp/*.rpm \
     && rm -f /tmp/*.rpm \
-    && /usr/bin/yum-config-manager --enable remi-php72 atomic \
+    && /usr/bin/yum-config-manager --enable remi-php70 atomic \
     && yum -q -y install supervisor yum-cron \
     && /usr/bin/localedef -c -i en_US -f UTF-8 en_US.UTF-8 \
     && mkdir -p /var/log/supervisor \
