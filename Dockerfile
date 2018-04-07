@@ -4,10 +4,11 @@ FROM centos:latest
 RUN VERSION=`cat /etc/redhat-release | awk '{printf "%d", $4}'` \
     && yum makecache fast && yum -q -y install deltarpm wget pygpgme \
     && wget -q -P /tmp https://dl.fedoraproject.org/pub/epel/epel-release-latest-$VERSION.noarch.rpm \
-    && wget -q -P /tmp http://rpms.remirepo.net/enterprise/remi-release-$VERSION.rpm \
-    && rpm -U --quiet /tmp/epel-release-latest-$VERSION.noarch.rpm /tmp/remi-release-$VERSION.rpm \
-    && rm -f /tmp/epel-release-latest-$VERSION.noarch.rpm /tmp/remi-release-$VERSION.rpm \
-    && /usr/bin/yum-config-manager --enable remi-php72 \
+    && wget -q -P /tmp https://rpms.remirepo.net/enterprise/remi-release-$VERSION.rpm \
+    && wget -q -P /tmp https://www6.atomicorp.com/channels/atomic/centos/$VERSION/x86_64/RPMS/atomic-release-1.0-21.el7.art.noarch.rpm \
+    && rpm -U --quiet /tmp/*.rpm \
+    && rm -f /tmp/*.rpm \
+    && /usr/bin/yum-config-manager --enable remi-php72 atomic \
     && yum -q -y install supervisor yum-cron \
     && /usr/bin/localedef -c -i en_US -f UTF-8 en_US.UTF-8 \
     && mkdir -p /var/log/supervisor \
@@ -22,6 +23,7 @@ RUN VERSION=`cat /etc/redhat-release | awk '{printf "%d", $4}'` \
     && rm -rf /var/cache/yum
 
 # Install apache and php
+COPY files/GeoIP.conf /etc/GeoIP.conf
 RUN yum -q -y install httpd \
         php \
         php-bcmath \
@@ -44,7 +46,7 @@ RUN yum -q -y install httpd \
         php-tidy \
         php-xml \
         php-xmlrpc \
-        GeoIP-update \
+        geoipupdate-cron \
         composer \
         git \
     && yum clean all \
@@ -55,8 +57,7 @@ RUN yum -q -y install httpd \
     && sed -i "s/zend_extension/;zend_extension/g" /etc/php.d/15-xdebug.ini \
     && ln -s /proc/1/fd/1 /var/log/httpd/access_log \
     && ln -s /proc/1/fd/2 /var/log/httpd/error_log \
-    && /etc/cron.weekly/geoipupdate \
-    && ln -s /usr/share/GeoIP/GeoLiteCity.dat /usr/share/GeoIP/GeoIPCity.dat
+    && /etc/cron.weekly/geoipupdate
 
 # Install blackfire php probe
 RUN wget -O - "http://packages.blackfire.io/fedora/blackfire.repo" | tee /etc/yum.repos.d/blackfire.repo \
